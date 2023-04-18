@@ -14,14 +14,14 @@ int main()
     const int screenHeight = 720;
 
     // Init window
-    InitWindow(screenWidth, screenHeight, "A Fuga de Alfredo");
+    InitWindow(screenWidth, screenHeight, "Car Rampage: ROAD RAGE!");
 
     // Initialize audio device
     InitAudioDevice();
 
     // Load game resources: textures
     Texture2D cenario = LoadTexture("resources/cenario.png");
-    Texture2D title = LoadTexture("resources/title.png");
+    Texture2D title = LoadTexture("resources/titulo.png");
     Texture2D carro = LoadTexture("resources/carro.png");
     Texture2D mad = LoadTexture("resources/mad2.png");
     Texture2D azul = LoadTexture("resources/carroazul.png");
@@ -259,7 +259,6 @@ int main()
                 if (madMode)
                 {
                     foodBar--;
-
                     if (foodBar <= 0)
                     {
                         madMode = false;
@@ -334,7 +333,7 @@ int main()
                     DrawTexture(title, screenWidth/2 - title.width/2, screenHeight/2 - title.height/2 - 80, WHITE);
 
                     // Draw blinking text
-                    if ((framesCounter/30) % 2) DrawTextEx(font, "APERTE ENTER", (Vector2){ screenWidth/2 - 150, 480 }, font.baseSize, 0, WHITE);
+                    if ((framesCounter/30) % 2) DrawTextEx(font, "APERTE ENTER", (Vector2){ screenWidth/2 - 150, 600 }, font.baseSize, 0, WHITE);
 
                 } break;
                 case GAMEPLAY:
@@ -367,8 +366,8 @@ int main()
                     DrawRectangle(20, 20, foodBar, 40, ORANGE);
                     DrawRectangleLines(20, 20, 400, 40, BLACK);
 
-                    DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ screenWidth - 300, 20 }, font.baseSize, -2, ORANGE);
-                    DrawTextEx(font, TextFormat("DISTANCE: %04i", (int)distance), (Vector2){ 550, 20 }, font.baseSize, -2, ORANGE);
+                    DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ screenWidth - 300, 20 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("DISTANCE: %04i", (int)distance), (Vector2){ 550, 20 }, font.baseSize, -2, YELLOW);
 
                     if (madMode)
                     {
@@ -384,10 +383,10 @@ int main()
 
                     DrawTextEx(font, "GAME OVER", (Vector2){ 300, 160 }, font.baseSize*3, -2, MAROON);
 
-                    DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ 680, 350 }, font.baseSize, -2, GOLD);
-                    DrawTextEx(font, TextFormat("DISTANCE: %04i", (int)distance), (Vector2){ 290, 350 }, font.baseSize, -2, GOLD);
-                    DrawTextEx(font, TextFormat("HIGHSCORE: %04i", hiscore), (Vector2){ 665, 400 }, font.baseSize, -2, ORANGE);
-                    DrawTextEx(font, TextFormat("HIGHDISTANCE: %04i", (int)hidistance), (Vector2){ 270, 400 }, font.baseSize, -2, ORANGE);
+                    DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ 680, 350 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("DISTANCE: %04i", (int)distance), (Vector2){ 290, 350 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("HIGHSCORE: %04i", hiscore), (Vector2){ 665, 400 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("HIGHDISTANCE: %04i", (int)hidistance), (Vector2){ 270, 400 }, font.baseSize, -2, YELLOW);
 
                     // Draw blinking text
                     if ((framesCounter/30) % 2) DrawTextEx(font, "PRESS ENTER TO REPLAY", (Vector2){ screenWidth/2 - 250, 520 }, font.baseSize, -2, LIGHTGRAY);
