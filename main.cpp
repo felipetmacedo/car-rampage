@@ -29,6 +29,10 @@ int main()
     Texture2D vermelho = LoadTexture("resources/carrovermelho.png");
     Texture2D engrenagem = LoadTexture("resources/engrenagem.png");
     Texture2D gframe = LoadTexture("resources/gframe.png");
+    Texture2D botao = LoadTexture("resources/botao.png");
+    Texture2D vv = LoadTexture("resources/vv.png");
+    Texture2D va = LoadTexture("resources/va.png");
+    Texture2D vl = LoadTexture("resources/vl.png");
 
     // CARREGA A FONTE
     Font font = LoadFont("resources/komika.png");
@@ -340,6 +344,23 @@ int main()
                 {
                     //PÓSIÇÃO DO TITULO DO JOGO
                     DrawTexture(title, screenWidth/2 - title.width/2, screenHeight/2 - title.height/2 - 80, WHITE);
+
+                    DrawTexture(botao, screenWidth/2 - 600, screenHeight/2 - 330, WHITE);
+                    DrawTextEx(font, "CIMA", (Vector2){ screenWidth/2 - 450, screenHeight/2 - 300}, font.baseSize, 0, YELLOW);
+                    DrawTextEx(font, "BAIXO", (Vector2){ screenWidth/2 - 450, screenHeight/2 - 200}, font.baseSize, 0, YELLOW);
+                    
+
+                    //MOSTRA A PONTUAÇÃO DE CADA CARRO COM SUA RESPECTIVA MINIATURA
+                    DrawTextEx(font, "SCORES:", (Vector2){ screenWidth/2 - 600, screenHeight/2 - 100, }, font.baseSize, 0, WHITE);
+
+                    DrawTexture(va, screenWidth/2 - 600, screenHeight/2 - 50, WHITE); 
+                    DrawTextEx(font, "-50", (Vector2){ screenWidth/2 - 450, screenHeight/2 - 50, }, font.baseSize, 0, BLUE);
+
+                    DrawTexture(vl, screenWidth/2 - 600, screenHeight/2 + 30, WHITE);
+                    DrawTextEx(font, "-150", (Vector2){ screenWidth/2 - 450, screenHeight/2 + 40}, font.baseSize, 0, ORANGE);
+
+                    DrawTexture(vv, screenWidth/2 - 600, screenHeight/2 + 110, WHITE);
+                    DrawTextEx(font, "-300", (Vector2){ screenWidth/2 - 450, screenHeight/2 + 120}, font.baseSize, 0, RED);
 
                     // APARECE A TECLA ENTER E FICA PISCANDO
                     if ((framesCounter/30) % 2) DrawTextEx(font, "APERTE ENTER", (Vector2){ screenWidth/2 - 150, 600 }, font.baseSize, 0, WHITE);
