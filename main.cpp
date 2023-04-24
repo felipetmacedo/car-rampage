@@ -8,18 +8,18 @@ typedef enum { TITLE, GAMEPLAY, ENDING } GameScreen;
 
 int main()
 {
-    // Initialization
+    // INICIALIZAÇAO
     //--------------------------------------------------------------------------------------
     const int screenWidth = 1280;
     const int screenHeight = 720;
 
-    // Init window
+    // ABRE JANELA
     InitWindow(screenWidth, screenHeight, "Car Rampage: ROAD RAGE!");
 
-    // Initialize audio device
+    // ABRE SOM
     InitAudioDevice();
 
-    // Load game resources: textures
+    // CARREGA AS TEXTURAS DO JOGO
     Texture2D cenario = LoadTexture("resources/cenario.png");
     Texture2D title = LoadTexture("resources/titulo.png");
     Texture2D carro = LoadTexture("resources/carro.png");
@@ -29,7 +29,6 @@ int main()
     Texture2D vermelho = LoadTexture("resources/carrovermelho.png");
     Texture2D engrenagem = LoadTexture("resources/engrenagem.png");
     Texture2D gframe = LoadTexture("resources/gframe.png");
-    Texture2D explosao = LoadTexture("resources/explosao.png");
 
     // CARREGA A FONTE
     Font font = LoadFont("resources/komika.png");
@@ -41,34 +40,32 @@ int main()
 
     // CARREGA MUSICA
     Music music = LoadMusicStream("resources/tokyo2.ogg");
+    Music madmodemusic = LoadMusicStream("resources/madmodemusic.ogg");
+    
     PlayMusicStream(music);
 
-    // Define scrolling variables
+    // DEFINE AS VARIAVEIS DE ROLAGEM
     int backScrolling = 0;
     int cenarioScrolling = 0;
 
-    // Define current screen
+    // DEFINE A TELA ATUAL
     GameScreen currentScreen = TITLE;
 
-    // Define player variables
+    // DEFINE VARIAVEIS DO JOCADOR
     int playerRail = 1;
     Rectangle playerBounds = { 30 + 14, playerRail*120 + 90 + 14, 100, 100 };
     bool madMode = false;
 
-    // Define enemies variables
+    // DEFINE VARIAVEIS DOS CARROS INIMIGOS
     Rectangle enemyBounds[MAX_ENEMIES];
     int enemyRail[MAX_ENEMIES];
     int enemyType[MAX_ENEMIES];
     bool enemyActive[MAX_ENEMIES];
     float enemySpeed = 10;
 
-    // Init enemies variables
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
-        // Define enemy type (all same probability)
-        //enemyType[i] = GetRandomValue(0, 3);
-
-        // Probability system for enemies type
+        // PROBABILIDADE DO TIPO DOS INIMIGOS
         int enemyProb = GetRandomValue(0, 100);
 
         if (enemyProb < 30) enemyType[i] = 0;
@@ -76,46 +73,45 @@ int main()
         else if (enemyProb < 90) enemyType[i] = 2;
         else enemyType[i] = 3;
 
-        // define enemy rail
+        // DEFINE VETOR DE INIMIGOS
         enemyRail[i] = GetRandomValue(0, 4);
 
-        // Make sure not two consecutive enemies in the same row
+        // CONFERE SE NAO EXITS DOIS INIMIGOS NA MESMA RAIL
         if (i > 0) while (enemyRail[i] == enemyRail[i - 1]) enemyRail[i] = GetRandomValue(0, 4);
 
         enemyBounds[i] = (Rectangle){ screenWidth + 14, 120*enemyRail[i] + 90 + 14, 100, 100 };
         enemyActive[i] = false;
     }
 
-    // Define additional game variables
+    // DEFINE AS OUTRAS VARIAVEIS DO JOGO
     int score = 0;
     float distance = 0.0f;
     int hiscore = 0;
     float hidistance = 0.0f;
-    int foodBar = 0;
+    int toolBar = 0;
     int framesCounter = 0;
     float timeCounter = 0;
+    int contmusic;
 
-    SetTargetFPS(60);       // Setup game frames per second
-    //--------------------------------------------------------------------------------------
+    SetTargetFPS(60);     //DEFINE O FPS DO JOGO
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    // LOOP PRINCIPAL DO JOGO
+    while (!WindowShouldClose())   
     {
-        UpdateMusicStream(music);   // Refill music stream buffers (if required)
-
+        UpdateMusicStream(music);  
         timeCounter += 0.01;
         framesCounter++;
 
-        // Game screens management
+        // CONTROLADOR DE TELAS DO JOGO
         switch (currentScreen)
         {
             case TITLE:
             {
-                // Sea scrolling
+                // CENARIO COMEÇA A RODAR
                 cenarioScrolling -= 2;
                 if (cenarioScrolling <= -screenWidth) cenarioScrolling = 0;
 
-                // Press enter to change to gameplay screen
+                // SE APERTAR ENTER COMEÇA O JOGO 
                 if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = GAMEPLAY;
@@ -125,26 +121,26 @@ int main()
             } break;
             case GAMEPLAY:
             {
-                // Background scrolling logic
+                // ROLAGEM DO CENÁRIO
                 backScrolling--;
                 if (backScrolling <= -screenWidth) backScrolling = 0;
 
-                // Sea scrolling logic
+
                 cenarioScrolling -= (enemySpeed - 2);
                 if (cenarioScrolling <= -screenWidth) cenarioScrolling = 0;
 
-                // Player movement logic
+                // MOVIMENTAÇÃO DO PLAYER, SE APERTAR O SETA ELE MUDA A RUA
                 if (IsKeyPressed(KEY_DOWN)) playerRail++;
                 else if (IsKeyPressed(KEY_UP)) playerRail--;
 
-                // Check player not out of rails
+                // DELIMITA SE ESTÁ DENTRO DAS 4 RUAS
                 if (playerRail > 4) playerRail = 4;
                 else if (playerRail < 0) playerRail = 0;
 
-                // Update player bounds
+                // ATUALIZA AS FRONTEIRAS DO JOGADOR
                 playerBounds = (Rectangle){ 30 + 14, playerRail*120 + 90 + 14, 100, 100 };
 
-                // Enemies activation logic (every 40 frames)
+                // ATIVA MAIS UM INIMIGO A CADA 40 FRAMES
                 if (framesCounter > 40)
                 {
                     for (int i = 0; i < MAX_ENEMIES; i++)
@@ -159,7 +155,7 @@ int main()
                     framesCounter = 0;
                 }
 
-                // Enemies logic
+                // LOGICA DOS INIMIGOS
                 for (int i = 0; i < MAX_ENEMIES; i++)
                 {
                     if (enemyActive[i])
@@ -167,14 +163,14 @@ int main()
                         enemyBounds[i].x -= enemySpeed;
                     }
 
-                    // Check enemies out of screen
+                    // VERIFICA SE TEM INIMIGOS TAO FORA DA TELA
                     if (enemyBounds[i].x <= 0 - 128)
                     {
                         enemyActive[i] = false;
                         enemyType[i] = GetRandomValue(0, 3);
                         enemyRail[i] = GetRandomValue(0, 4);
 
-                        // Make sure not two consecutive enemies in the same row
+                        // VERIFICA SE EXISTE DOIS INIMIGOS CONSECUTIVOS NA MESMA RUA
                         if (i > 0) while (enemyRail[i] == enemyRail[i - 1]) enemyRail[i] = GetRandomValue(0, 4);
 
                         enemyBounds[i] = (Rectangle){ screenWidth + 14, 120*enemyRail[i] + 90 + 14, 100, 100 };
@@ -183,30 +179,28 @@ int main()
 
                 if (!madMode) enemySpeed += 0.005;
 
-                // Check collision player vs enemies
+                // VERIFICA A COLISÃO DOS CARROS INIMIGOS COM O PRINCIPAL
                 for (int i = 0; i < MAX_ENEMIES; i++)
                 {
                     if (enemyActive[i])
                     {
+                        // SE EXITSER COLISAO
                         if (CheckCollisionRecs(playerBounds, enemyBounds[i]))
                         {
-                            if (enemyType[i] < 3)   // Bad enemies
+                            if (enemyType[i] < 3)
                             {
                                 if (madMode)
                                 {
-                                    if (enemyType[i] == 0) score += 50;
-                                    else if (enemyType[i] == 1) score += 150;
-                                    else if (enemyType[i] == 2) score += 300;
+                                    if (enemyType[i] == 0) score += 50; // CARRO AZUL
+                                    else if (enemyType[i] == 1) score += 150; // CARRO LARANJA
+                                    else if (enemyType[i] == 2) score += 300; //CARRO VERMELHO
 
-                                    foodBar += 15;
-
+                                    toolBar += 15;
                                     enemyActive[i] = false;
-
-                                    // After enemy deactivation, reset enemy parameters to be reused
                                     enemyType[i] = GetRandomValue(0, 3);
                                     enemyRail[i] = GetRandomValue(0, 4);
 
-                                    // Make sure not two consecutive enemies in the same row
+                                    // VERIFICA SE EXISTE DOIS INIMIGOS CONSECUTIVOS NA MESMA RUA
                                     if (i > 0) while (enemyRail[i] == enemyRail[i - 1]) enemyRail[i] = GetRandomValue(0, 4);
 
                                     enemyBounds[i] = (Rectangle){ screenWidth + 14, 120*enemyRail[i] + 90 + 14, 100, 100 };
@@ -215,34 +209,36 @@ int main()
                                 }
                                 else
                                 {
-                                    // Player die logic
+                                    // LOGICA DE MORTE CASO BATA EM OUTRO E CARRO E NAO ESTIVER NO MADMODE
                                     PlaySound(boom);
 
                                     currentScreen = ENDING;
                                     framesCounter = 0;
 
-                                    // Save hiscore and hidistance for next game
+                                    // SALVA RECORDE MAXIMO E PONTOS MAXIMO
                                     if (score > hiscore) hiscore = score;
                                     if (distance > hidistance) hidistance = distance;
                                 }
                             }
-                            else    // Sweet fish
+                            else    
+                            // COLISAO COM A ENGRANAGEM
                             {
                                 enemyActive[i] = false;
                                 enemyType[i] = GetRandomValue(0, 3);
                                 enemyRail[i] = GetRandomValue(0, 4);
 
-                                // Make sure not two consecutive enemies in the same row
+                                // VERIFICA SE EXISTE DOIS INIMIGOS CONSECUTIVOS NA MESMA RUA
                                 if (i > 0) while (enemyRail[i] == enemyRail[i - 1]) enemyRail[i] = GetRandomValue(0, 4);
 
                                 enemyBounds[i] = (Rectangle){ screenWidth + 14, 120*enemyRail[i] + 90 + 14, 100, 100 };
-
-                                if (!madMode) foodBar += 80;
-                                else foodBar += 25;
+                                
+                                //AUMENTA A BARRA DE ENGRANAGEM
+                                if (!madMode) toolBar += 80;
+                                else toolBar += 25;
 
                                 score += 10;
-
-                                if (foodBar == 400)
+                                //SE ELE PEGAR 5 ENGRANAGENS 80x5 = 400, MADMODE VAI SER VERDADE
+                                if (toolBar == 400)
                                 {
                                     madMode = true;
 
@@ -255,35 +251,50 @@ int main()
                     }
                 }
 
-                // Gamera mode logic
+                // LOGICA DO MAD MODE
                 if (madMode)
                 {
-                    foodBar--;
-                    if (foodBar <= 0)
+                    //PAUSA MUSICA TOKYO DRIFT
+                    PauseMusicStream(music);
+
+                    if(contmusic == 1){
+                        ResumeMusicStream(madmodemusic);
+                    }else      
+                        PlayMusicStream(madmodemusic);
+
+                    UpdateMusicStream(madmodemusic); 
+                    // DIMINUI A BARRA DE FERRAMENTAS ENQUANTO ESTIVER NO MADMODE
+                    toolBar--;
+                    if (toolBar <= 0)
                     {
                         madMode = false;
                         enemySpeed -= 2;
                         if (enemySpeed < 10) enemySpeed = 10;
                     }
+                }else{
+                    PauseMusicStream(madmodemusic);
+                    //VOLTA A TOCAR TOKYO DRIFT
+                    ResumeMusicStream(music);
+                    int contmusic = 1;
                 }
 
-                // Update distance counter                
+                // ATUALIZA O CONTADOR DE DISTANCIA               
                 distance += 0.5f;
 
             } break;
             case ENDING:
             {
-                // Press enter to play again
+                //SE APERTAR ENTER, VOLTA PARA A TELA DO JOGO E RESETA AS VARIAVEIS ANTIGAS
                 if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = GAMEPLAY;
 
-                    // Reset player
+                    //RESETA O JOGADOR
                     playerRail = 1;
                     playerBounds = (Rectangle){ 30 + 14, playerRail*120 + 90 + 14, 100, 100 };
                     madMode = false;
 
-                    // Reset enemies data
+                    // RESETA OS INIMIGOS
                     for (int i = 0; i < MAX_ENEMIES; i++)
                     {
                         int enemyProb = GetRandomValue(0, 100);
@@ -293,10 +304,9 @@ int main()
                         else if (enemyProb < 90) enemyType[i] = 2;
                         else enemyType[i] = 3;
 
-                        //enemyType[i] = GetRandomValue(0, 3);
                         enemyRail[i] = GetRandomValue(0, 4);
 
-                        // Make sure not two consecutive enemies in the same row
+                        // VERIFICA SE EXISTE DOIS INIMIGOS CONSECUTIVOS NA MESMA RUA
                         if (i > 0) while (enemyRail[i] == enemyRail[i - 1]) enemyRail[i] = GetRandomValue(0, 4);
 
                         enemyBounds[i] = (Rectangle){ screenWidth + 14, 120*enemyRail[i] + 90 + 14, 100, 100 };
@@ -305,10 +315,10 @@ int main()
 
                     enemySpeed = 10;
 
-                    // Reset game variables
+                    // RESETA AS VARIAVEIS DO JOGO
                     score = 0;
                     distance = 0.0;
-                    foodBar = 0;
+                    toolBar = 0;
                     framesCounter = 0;
                 }
 
@@ -316,12 +326,11 @@ int main()
             default: break;
         }
 
-        // DESENHO
-        //----------------------------------------------------------------------------------
+        // PARTE DO DESENHOS
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
-
+            // COLOCA O CENARIO E FAZ ROLAR
             DrawTexture(cenario, cenarioScrolling, 0, WHITE);
             DrawTexture(cenario, screenWidth + cenarioScrolling, 0, WHITE);
 
@@ -329,27 +338,26 @@ int main()
             {
                 case TITLE:
                 {
-                    // Draw title
+                    //PÓSIÇÃO DO TITULO DO JOGO
                     DrawTexture(title, screenWidth/2 - title.width/2, screenHeight/2 - title.height/2 - 80, WHITE);
 
-                    // Draw blinking text
+                    // APARECE A TECLA ENTER E FICA PISCANDO
                     if ((framesCounter/30) % 2) DrawTextEx(font, "APERTE ENTER", (Vector2){ screenWidth/2 - 150, 600 }, font.baseSize, 0, WHITE);
 
                 } break;
                 case GAMEPLAY:
                 {
 
-                    // Draw player
+                    // DESENHA O CARRO PRINIPAL
                     if (!madMode) DrawTexture(carro, playerBounds.x - 50, playerBounds.y - 50, WHITE);
                     else DrawTexture(mad, playerBounds.x - 100, playerBounds.y - 40, WHITE);
 
 
-                    // Draw enemies
+                    // DESENHA INIMIGOS
                     for (int i = 0; i < MAX_ENEMIES; i++)
                     {
                         if (enemyActive[i])
                         {
-                            // Draw enemies
                             switch(enemyType[i])
                             {
                                 case 0: DrawTexture(azul, enemyBounds[i].x, enemyBounds[i].y, WHITE); break;
@@ -361,9 +369,9 @@ int main()
                         }
                     }
 
-                    // Draw gameplay interface
+                    // DESENHA OUTROS ELEMENTOS DO JOGO
                     DrawRectangle(20, 20, 400, 40, Fade(GRAY, 0.4f));
-                    DrawRectangle(20, 20, foodBar, 40, ORANGE);
+                    DrawRectangle(20, 20, toolBar, 40, ORANGE);
                     DrawRectangleLines(20, 20, 400, 40, BLACK);
 
                     DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ screenWidth - 300, 20 }, font.baseSize, -2, YELLOW);
@@ -378,7 +386,7 @@ int main()
                 } break;
                 case ENDING:
                 {
-                    // Draw a transparent black rectangle that covers all screen
+                    // ESCURE A TELA UM POUCO CASO ESTEJA NA TELA DE GAME OVER
                     DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.4f));
 
                     DrawTextEx(font, "GAME OVER", (Vector2){ 300, 160 }, font.baseSize*3, -2, MAROON);
@@ -388,7 +396,7 @@ int main()
                     DrawTextEx(font, TextFormat("HIGHSCORE: %04i", hiscore), (Vector2){ 665, 400 }, font.baseSize, -2, YELLOW);
                     DrawTextEx(font, TextFormat("HIGHDISTANCE: %04i", (int)hidistance), (Vector2){ 270, 400 }, font.baseSize, -2, YELLOW);
 
-                    // Draw blinking text
+                    // FICA PISCANDO PARA JOGAR DENOVO
                     if ((framesCounter/30) % 2) DrawTextEx(font, "PRESS ENTER TO REPLAY", (Vector2){ screenWidth/2 - 250, 520 }, font.baseSize, -2, LIGHTGRAY);
 
                 } break;
@@ -396,13 +404,9 @@ int main()
             }
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-
-    // Unload textures
+     // DESCARREGA TODOS ELEMENTOS DO JOGO!!
     UnloadTexture(cenario);
     UnloadTexture(gframe);
     UnloadTexture(title);
@@ -412,20 +416,15 @@ int main()
     UnloadTexture(vermelho);
     UnloadTexture(engrenagem);
     UnloadTexture(mad);
-
-    // Unload font texture
     UnloadFont(font);
-
-    // Unload sounds
     UnloadSound(ferramenta);
     UnloadSound(boom);
     UnloadSound(transformacao);
+    UnloadMusicStream(music);
+    UnloadMusicStream(madmodemusic);
 
-    UnloadMusicStream(music);   // Unload music
-    CloseAudioDevice();         // Close audio device
+    CloseAudioDevice();         
 
-    CloseWindow();              // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
+    CloseWindow();             
     return 0;
 }
