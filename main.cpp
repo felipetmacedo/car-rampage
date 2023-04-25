@@ -15,29 +15,13 @@ const int screenWidth = 1280;
 const int screenHeight = 720;
 
 // DEFINE ELEMENTOS DO JOGO
-Texture2D cenario;
-Texture2D title;
-Texture2D carro;
-Texture2D mad;
-Texture2D azul;
-Texture2D laranja;
-Texture2D vermelho;
-Texture2D engrenagem;
-Texture2D gframe;
-Texture2D botao;
-Texture2D vv;
-Texture2D va;
-Texture2D vl;
+Texture2D cenario; Texture2D title; Texture2D carro; Texture2D mad; Texture2D azul; Texture2D laranja; Texture2D vermelho; Texture2D engrenagem; Texture2D gframe; Texture2D botao; Texture2D vv; Texture2D va; Texture2D vl;
 
 // CARREGA A FONTE
 Font font;
 
 // CARREGA OS SONS
-Sound transformacao;
-Sound ferramenta;
-Sound boom;
-Music music;
-Music madmodemusic;
+Sound transformacao; Sound ferramenta; Sound boom; Music music; Music madmodemusic;
 
 // DEFINE VARIAVEIS DOS CARROS INIMIGOS
 Rectangle enemyBounds[MAX_ENEMIES];
