@@ -3,7 +3,7 @@
 
 ![Car Rampage : ROAD RAGE](CapturasdeTela/telaprincipal.png "Tela Inicial")
 
-## MAD MODE
+## Mad Max Mode
 
 ![Car Rampage : ROAD RAGE](CapturasdeTela/madmode.png "MAD MODE")
 
