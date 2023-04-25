@@ -353,14 +353,17 @@ int main()
                     //MOSTRA A PONTUAÇÃO DE CADA CARRO COM SUA RESPECTIVA MINIATURA
                     DrawTextEx(font, "SCORES:", (Vector2){ screenWidth/2 - 600, screenHeight/2 - 100, }, font.baseSize, 0, WHITE);
 
-                    DrawTexture(va, screenWidth/2 - 600, screenHeight/2 - 50, WHITE); 
-                    DrawTextEx(font, "-50", (Vector2){ screenWidth/2 - 450, screenHeight/2 - 50, }, font.baseSize, 0, BLUE);
+                    DrawTexture(vv, screenWidth/2 - 600, screenHeight/2 - 50, WHITE); 
+                    DrawTextEx(font, "-300", (Vector2){ screenWidth/2 - 450, screenHeight/2 - 40, }, font.baseSize, 0, RED);
 
                     DrawTexture(vl, screenWidth/2 - 600, screenHeight/2 + 30, WHITE);
                     DrawTextEx(font, "-150", (Vector2){ screenWidth/2 - 450, screenHeight/2 + 40}, font.baseSize, 0, ORANGE);
 
-                    DrawTexture(vv, screenWidth/2 - 600, screenHeight/2 + 110, WHITE);
-                    DrawTextEx(font, "-300", (Vector2){ screenWidth/2 - 450, screenHeight/2 + 120}, font.baseSize, 0, RED);
+                    DrawTexture(va, screenWidth/2 - 600, screenHeight/2 + 110, WHITE);
+                    DrawTextEx(font, "-50", (Vector2){ screenWidth/2 - 450, screenHeight/2 + 120}, font.baseSize, 0, BLUE);
+
+                    DrawTexture(engrenagem, screenWidth/2 - 560, screenHeight/2 + 200, WHITE);
+                    DrawTextEx(font, "-10", (Vector2){ screenWidth/2 - 450, screenHeight/2 + 210}, font.baseSize, 0, LIGHTGRAY);
 
                     // APARECE A TECLA ENTER E FICA PISCANDO
                     if ((framesCounter/30) % 2) DrawTextEx(font, "APERTE ENTER", (Vector2){ screenWidth/2 - 150, 600 }, font.baseSize, 0, WHITE);
@@ -395,8 +398,8 @@ int main()
                     DrawRectangle(20, 20, toolBar, 40, ORANGE);
                     DrawRectangleLines(20, 20, 400, 40, BLACK);
 
-                    DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ screenWidth - 300, 20 }, font.baseSize, -2, YELLOW);
-                    DrawTextEx(font, TextFormat("DISTANCE: %04i", (int)distance), (Vector2){ 550, 20 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("PONTOS: %04i", score), (Vector2){ screenWidth - 300, 20 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("DISTANCIA: %04i", (int)distance), (Vector2){ 550, 20 }, font.baseSize, -2, YELLOW);
 
                     if (madMode)
                     {
@@ -412,13 +415,13 @@ int main()
 
                     DrawTextEx(font, "GAME OVER", (Vector2){ 300, 160 }, font.baseSize*3, -2, MAROON);
 
-                    DrawTextEx(font, TextFormat("POINTS: %04i", score), (Vector2){ 680, 350 }, font.baseSize, -2, YELLOW);
-                    DrawTextEx(font, TextFormat("DISTANCE: %04i", (int)distance), (Vector2){ 290, 350 }, font.baseSize, -2, YELLOW);
-                    DrawTextEx(font, TextFormat("HIGHSCORE: %04i", hiscore), (Vector2){ 665, 400 }, font.baseSize, -2, YELLOW);
-                    DrawTextEx(font, TextFormat("HIGHDISTANCE: %04i", (int)hidistance), (Vector2){ 270, 400 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("PONTOS: %04i", score), (Vector2){ 665, 350 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("DISTANCIA: %04i", (int)distance), (Vector2){ 290, 350 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("RECORDE PONTOS: %04i", hiscore), (Vector2){ 665, 400 }, font.baseSize, -2, YELLOW);
+                    DrawTextEx(font, TextFormat("RECORDE DISTANCIA: %04i", (int)hidistance), (Vector2){ 120, 400 }, font.baseSize, -2, YELLOW);
 
                     // FICA PISCANDO PARA JOGAR DENOVO
-                    if ((framesCounter/30) % 2) DrawTextEx(font, "PRESS ENTER TO REPLAY", (Vector2){ screenWidth/2 - 250, 520 }, font.baseSize, -2, LIGHTGRAY);
+                    if ((framesCounter/30) % 2) DrawTextEx(font, "APERTER ENTER PARA JOGAR DENOVO", (Vector2){ screenWidth/2 - 350, 520 }, font.baseSize, -2, LIGHTGRAY);
 
                 } break;
                 default: break;
