@@ -221,7 +221,7 @@ int main()
 
                                     // SALVA RECORDE MAXIMO E PONTOS MAXIMO
                                     if (score > hiscore) hiscore = score;
-                                    if (distance > hidistance) hidistance = distance;
+                                    if (distance > hidistance) hidistance = distance + 1;
                                 }
                             }
                             else    
