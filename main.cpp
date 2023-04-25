@@ -11,6 +11,9 @@ typedef enum
     ENDING
 } GameScreen;
 
+const int screenWidth = 1280;
+const int screenHeight = 720;
+
 // DEFINE ELEMENTOS DO JOGO
 Texture2D cenario;
 Texture2D title;
@@ -36,8 +39,20 @@ Sound boom;
 Music music;
 Music madmodemusic;
 
-const int screenWidth = 1280;
-const int screenHeight = 720;
+// DEFINE VARIAVEIS DOS CARROS INIMIGOS
+Rectangle enemyBounds[MAX_ENEMIES];
+int enemyRail[MAX_ENEMIES];
+int enemyType[MAX_ENEMIES];
+bool enemyActive[MAX_ENEMIES];
+float enemySpeed = 10;
+
+// DEFINE VARIAVEL DO JOGADOR
+int playerRail = 1;
+Rectangle playerBounds = {30 + 14, playerRail * 120 + 90 + 14, 100, 100};
+
+//
+bool madMode = false;
+int toolBar = 0;
 
 void carregaTudo()
 {
@@ -126,6 +141,54 @@ void desenhaTelaInicial(int *framescounter)
         DrawTextEx(font, "APERTE ENTER", (Vector2){screenWidth / 2 - 150, 600}, font.baseSize, 0, WHITE);
 }
 
+void desenhaGameplay(int *score, float *distance, int *hiscore, bool *madMode)
+{
+    // DESENHA O CARRO PRINIPAL
+    if (!madMode)
+        DrawTexture(carro, playerBounds.x - 50, playerBounds.y - 50, WHITE);
+    else
+        DrawTexture(mad, playerBounds.x - 100, playerBounds.y - 40, WHITE);
+
+    // DESENHA INIMIGOS
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (enemyActive[i])
+        {
+            switch (enemyType[i])
+            {
+            case 0:
+                DrawTexture(azul, enemyBounds[i].x, enemyBounds[i].y, WHITE);
+                break;
+            case 1:
+                DrawTexture(laranja, enemyBounds[i].x, enemyBounds[i].y, WHITE);
+                break;
+            case 2:
+                DrawTexture(vermelho, enemyBounds[i].x, enemyBounds[i].y, WHITE);
+                break;
+            case 3:
+                DrawTexture(engrenagem, enemyBounds[i].x + 40, enemyBounds[i].y + 40, WHITE);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    // DESENHA OUTROS ELEMENTOS DO JOGO
+    DrawRectangle(20, 20, 400, 40, Fade(GRAY, 0.4f));
+    DrawRectangle(20, 20, toolBar, 40, ORANGE);
+    DrawRectangleLines(20, 20, 400, 40, BLACK);
+
+    DrawTextEx(font, TextFormat("PONTOS: %04i", score), (Vector2){screenWidth - 300, 20}, font.baseSize, -2, YELLOW);
+    DrawTextEx(font, TextFormat("DISTANCIA: %04i", (int)distance), (Vector2){550, 20}, font.baseSize, -2, YELLOW);
+
+    if (madMode)
+    {
+        DrawText("MODO MAD MAX", 60, 22, 40, WHITE);
+        DrawTexture(gframe, 0, 0, Fade(WHITE, 0.5f));
+    }
+}
+
 void desenhaTelaFinal(int *score, float *distance, int *hiscore, float *hidistance, int *framescounter)
 {
     // ESCURE A TELA UM POUCO CASO ESTEJA NA TELA DE GAME OVER
@@ -143,6 +206,57 @@ void desenhaTelaFinal(int *score, float *distance, int *hiscore, float *hidistan
         DrawTextEx(font, "APERTER ENTER PARA JOGAR DENOVO", (Vector2){screenWidth / 2 - 350, 520}, font.baseSize, -2, LIGHTGRAY);
 }
 
+void logicaInimigos()
+{
+    // LOGICA DOS INIMIGOS
+    for (int i = 0; i < MAX_ENEMIES; i++)
+    {
+        if (enemyActive[i])
+        {
+            enemyBounds[i].x -= enemySpeed;
+        }
+
+        // VERIFICA SE TEM INIMIGOS TAO FORA DA TELA
+        if (enemyBounds[i].x <= 0 - 128)
+        {
+            enemyActive[i] = false;
+            enemyType[i] = GetRandomValue(0, 3);
+            enemyRail[i] = GetRandomValue(0, 4);
+
+            // VERIFICA SE EXISTE DOIS INIMIGOS CONSECUTIVOS NA MESMA RUA
+            if (i > 0)
+                while (enemyRail[i] == enemyRail[i - 1])
+                    enemyRail[i] = GetRandomValue(0, 4);
+
+            enemyBounds[i] = (Rectangle){1280 + 14, 120 * enemyRail[i] + 90 + 14, 100, 100};
+        }
+    }
+}
+
+void logicamadMode(int *contmusic)
+{
+    // PAUSA MUSICA TOKYO DRIFT
+    PauseMusicStream(music);
+
+    if (*contmusic == 1)
+    {
+        ResumeMusicStream(madmodemusic);
+    }
+    else
+        PlayMusicStream(madmodemusic);
+
+    UpdateMusicStream(madmodemusic);
+    // DIMINUI A BARRA DE FERRAMENTAS ENQUANTO ESTIVER NO MADMODE
+    toolBar--;
+    if (toolBar <= 0)
+    {
+        madMode = false;
+        enemySpeed -= 2;
+        if (enemySpeed < 10)
+            enemySpeed = 10;
+    }
+}
+
 int main()
 {
     // INICIALIZAÇAO
@@ -150,12 +264,11 @@ int main()
     const int screenWidth = 1280;
     const int screenHeight = 720;
 
-    // DEFINE AS OUTRAS VARIAVEIS DO JOGO
+    // DEFINE VARIAVEIS DO JOGO
     int score = 0;
     float distance = 0.0f;
     int hiscore = 0;
     float hidistance = 0.0f;
-    int toolBar = 0;
     int framesCounter = 0;
     float timeCounter = 0;
     int contmusic;
@@ -176,18 +289,6 @@ int main()
 
     // DEFINE A TELA ATUAL
     GameScreen currentScreen = TITLE;
-
-    // DEFINE VARIAVEIS DO JOCADOR
-    int playerRail = 1;
-    Rectangle playerBounds = {30 + 14, playerRail * 120 + 90 + 14, 100, 100};
-    bool madMode = false;
-
-    // DEFINE VARIAVEIS DOS CARROS INIMIGOS
-    Rectangle enemyBounds[MAX_ENEMIES];
-    int enemyRail[MAX_ENEMIES];
-    int enemyType[MAX_ENEMIES];
-    bool enemyActive[MAX_ENEMIES];
-    float enemySpeed = 10;
 
     for (int i = 0; i < MAX_ENEMIES; i++)
     {
@@ -294,28 +395,7 @@ int main()
             }
 
             // LOGICA DOS INIMIGOS
-            for (int i = 0; i < MAX_ENEMIES; i++)
-            {
-                if (enemyActive[i])
-                {
-                    enemyBounds[i].x -= enemySpeed;
-                }
-
-                // VERIFICA SE TEM INIMIGOS TAO FORA DA TELA
-                if (enemyBounds[i].x <= 0 - 128)
-                {
-                    enemyActive[i] = false;
-                    enemyType[i] = GetRandomValue(0, 3);
-                    enemyRail[i] = GetRandomValue(0, 4);
-
-                    // VERIFICA SE EXISTE DOIS INIMIGOS CONSECUTIVOS NA MESMA RUA
-                    if (i > 0)
-                        while (enemyRail[i] == enemyRail[i - 1])
-                            enemyRail[i] = GetRandomValue(0, 4);
-
-                    enemyBounds[i] = (Rectangle){screenWidth + 14, 120 * enemyRail[i] + 90 + 14, 100, 100};
-                }
-            }
+            logicaInimigos();
 
             if (!madMode)
                 enemySpeed += 0.005;
@@ -406,26 +486,7 @@ int main()
             // LOGICA DO MAD MODE
             if (madMode)
             {
-                // PAUSA MUSICA TOKYO DRIFT
-                PauseMusicStream(music);
-
-                if (contmusic == 1)
-                {
-                    ResumeMusicStream(madmodemusic);
-                }
-                else
-                    PlayMusicStream(madmodemusic);
-
-                UpdateMusicStream(madmodemusic);
-                // DIMINUI A BARRA DE FERRAMENTAS ENQUANTO ESTIVER NO MADMODE
-                toolBar--;
-                if (toolBar <= 0)
-                {
-                    madMode = false;
-                    enemySpeed -= 2;
-                    if (enemySpeed < 10)
-                        enemySpeed = 10;
-                }
+                logicamadMode(&contmusic);
             }
             else
             {
@@ -489,7 +550,6 @@ int main()
         default:
             break;
         }
-
         // PARTE DO DESENHOS
         BeginDrawing();
 
@@ -507,51 +567,7 @@ int main()
         break;
         case GAMEPLAY:
         {
-
-            // DESENHA O CARRO PRINIPAL
-            if (!madMode)
-                DrawTexture(carro, playerBounds.x - 50, playerBounds.y - 50, WHITE);
-            else
-                DrawTexture(mad, playerBounds.x - 100, playerBounds.y - 40, WHITE);
-
-            // DESENHA INIMIGOS
-            for (int i = 0; i < MAX_ENEMIES; i++)
-            {
-                if (enemyActive[i])
-                {
-                    switch (enemyType[i])
-                    {
-                    case 0:
-                        DrawTexture(azul, enemyBounds[i].x, enemyBounds[i].y, WHITE);
-                        break;
-                    case 1:
-                        DrawTexture(laranja, enemyBounds[i].x, enemyBounds[i].y, WHITE);
-                        break;
-                    case 2:
-                        DrawTexture(vermelho, enemyBounds[i].x, enemyBounds[i].y, WHITE);
-                        break;
-                    case 3:
-                        DrawTexture(engrenagem, enemyBounds[i].x + 40, enemyBounds[i].y + 40, WHITE);
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            }
-
-            // DESENHA OUTROS ELEMENTOS DO JOGO
-            DrawRectangle(20, 20, 400, 40, Fade(GRAY, 0.4f));
-            DrawRectangle(20, 20, toolBar, 40, ORANGE);
-            DrawRectangleLines(20, 20, 400, 40, BLACK);
-
-            DrawTextEx(font, TextFormat("PONTOS: %04i", score), (Vector2){screenWidth - 300, 20}, font.baseSize, -2, YELLOW);
-            DrawTextEx(font, TextFormat("DISTANCIA: %04i", (int)distance), (Vector2){550, 20}, font.baseSize, -2, YELLOW);
-
-            if (madMode)
-            {
-                DrawText("MODO MAD MAX", 60, 22, 40, WHITE);
-                DrawTexture(gframe, 0, 0, Fade(WHITE, 0.5f));
-            }
+            desenhaGameplay(&score, &distance, &hiscore, &madMode);
         }
         break;
         case ENDING:
